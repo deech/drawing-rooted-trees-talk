@@ -1,0 +1,395 @@
+#+TITLE: Drawing Rooted Trees ...
+#+AUTHOR: Aditya Siram (@deech)
+#+OPTIONS: H:1 toc:f
+#+LATEX_CLASS: beamer
+#+LATEX_listingsCLASS_OPTIONS: [presentation]
+#+BEAMER_THEME: Madrid
+
+* Ugly Tree
+#+ATTR_LATEX: :width 0.3\linewidth
+[[file:rooted-unbalanced-single-stem.png]]
+* Ugly Tree
+#+ATTR_LATEX: :width 0.3\linewidth
+[[file:rooted-unbalanced-stacked-left.png]]
+* Nice Tree
+#+ATTR_LATEX: :width 0.3\linewidth
+[[file:rooted-balanced-single-stem.png]]
+* Nice Tree
+ #+ATTR_LATEX: :width 0.6\linewidth
+[[file:rooted-balanced.png]]
+* Knuth
+- Knuth (1971)
+#+ATTR_LATEX: :width 0.3\linewidth
+[[file:knuth.png]]
+- 'nuf said.
+* The Big Picture
+  #+ATTR_LATEX: :width 0.7\linewidth
+  [[file:tree-pretty.png]]
+- Quadratic is easy
+  - Update every node in case of conflicts
+  - Undergraduate exercise
+- Linear is /hard/
+  - 25 years (1981 - 2006)
+  - 33 years with Knuth (1971 - 2006)
+* The Big Picture
+- Two major players
+- Walker (1989)
+- Buccheim (2006)
+  - Assisted by Reingold (1981)
+* The Big Picture
+- Two passes
+- First pass sets X coordinates naively, records conflicts.
+- Second pass updates X coordinates accounting for conflicts.
+* The Big Picture
+- Do a post order traversal
+  #+ATTR_LATEX: :width 0.9\linewidth
+  [[file:post-order-tree.png]]
+- This is an ugly tree
+* The Big Picture
+- First pass
+- Save each node's X
+- Record shifts (green arrows) but don't execute
+  #+ATTR_LATEX: :width 0.9\linewidth
+  [[file:tree-numbered-conflict.png]]
+* The Big Picture
+- Pre-order second pass
+  #+ATTR_LATEX: :width 0.9\linewidth
+  [[file:pre-order-tree.png]]
+- Add shifts to X-coordinate
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  []
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-letterd.png
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  [A]
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-a.png
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  [A,B]
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-b.png
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  [A,B,C]
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-c.png
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  [A,B,H]
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-h.png
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  [A,B,I]
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-i.png
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  [A,B,I,J]
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-j.png
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  [A,M,I,J]
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-m.png
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  [A,M,N,J] (* conflicts with I *)
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-n.png
+* Walker
+- APPORTION
+- Track back to greatest common ancestors
+- Record shifts in siblings between conflicting roots
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-n-shifts.png
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  [A,O,N,J]
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-o.png
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  [A,P,N,J]
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-p.png
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  [A,P,Q,J]
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-q.png
+* Walker
+- Left neighbors
+  #+BEGIN_EXAMPLE
+  [A,P,Q,R] (* conflicts with J *)
+  #+END_EXAMPLE
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-r.png
+* Walker
+- APPORTION
+- Track back to greatest common ancestors and shift
+- Shifts are accumulated!
+  #+ATTR_LATEX: :width 0.9\linewidth
+  file:tree-lettered-r-shifts.png
+* Walker
+- Second pass, pre-order
+- Shifts propogate to subtrees
+- Pretty tree
+* Walker
+- Not linear!
+- Discovered (and fixed) by Buccheim in /2006/!
+  - 16 years
+- /All/ the problems are in APPORTION.
+* Buccheim
+- Finding common ancestors is not linear!
+  #+ATTR_LATEX: :width 0.9\linewidth
+  [[file:tree-letterd-ancestor-problem.png]]
+* Leftmost node blowup
+- Finding the leftmost node is also not linear
+- Not as obvious
+- Buccheim shows a /pattern/ of trees that cause quadratic blowup.
+  #+ATTR_LATEX: :width 0.9\linewidth
+  [[file:tree-lettered-r-highlighted.png]]
+* Leftmost node blowup
+- Pick a k, say, 3
+  - Hang two chains of (2 * k) from root.
+  #+ATTR_LATEX: :width 0.3\linewidth
+ [[file:getleftmost-worst-case-tree-1.png]]
+* Leftmost node blowup
+- (k - (current level))-th odd number chains on right
+ - current level = 1, k = 3, (3 - 1)th odd number = 3
+ #+ATTR_LATEX: :width 0.3\linewidth
+ [[file:getleftmost-worst-case-tree-2.png]]
+* Leftmost node blowup
+- (k - (current level))-th odd number chains on right
+ - current level = 2, k = 3, (3 - 2)th odd number = 1
+ #+ATTR_LATEX: :width 0.3\linewidth
+ [[file:getleftmost-worst-case-tree.png]]
+* Leftmost node blowup
+- Total nodes = sum(k even numbers) + k
+  - 6 + 4 + 2 + 3 = 15
+ #+ATTR_LATEX: :width 0.3\linewidth
+ [[file:getleftmost-worst-case-tree.png]]
+
+* Leftmost node blowup
+- Total nodes = k * (k + 1) + k
+  - 3 * (3 + 1) + 3 = 15
+ #+ATTR_LATEX: :width 0.3\linewidth
+ [[file:getleftmost-worst-case-tree.png]]
+* Leftmost node blowup
+- Total nodes = k^2 + k + k = \theta(k^2)
+  - 3 * (3 + 1) + 3 = 15
+ #+ATTR_LATEX: :width 0.3\linewidth
+ [[file:getleftmost-worst-case-tree.png]]
+* Leftmost node blowup
+- Number of comparisons
+ - level 1 = 9
+ #+ATTR_LATEX: :width 0.3\linewidth
+ [[file:getleftmost-worst-case-tree-level-0-comp.png]]
+
+* Leftmost node blowup
+- Number of comparisons
+ - level 2 = 4
+ #+ATTR_LATEX: :width 0.3\linewidth
+ [[file:getleftmost-worst-case-tree-level-1-comp.png]]
+
+* Leftmost node blowup
+- Number of comparisons
+ - level 3 = 1
+ #+ATTR_LATEX: :width 0.3\linewidth
+ [[file:getleftmost-worst-case-tree-level-2-comp.png]]
+* Leftmost node blowup
+- Total # of calls
+  - 1 + 4 + 9
+- sum of k squares
+  - k^3/3 + k^2/2 + k/6
+  - \theta(k^3)
+- nodes, k^2
+- calls, k^3
+- k,     nodes^(1/2)
+- \Omega(k^3) = \Omega(nodes^(3/2))
+* Shifting blowup
+- Shifting is also not linear!
+- Again, Buccheim shows a pattern of trees
+ [[file:tree-lettered-r-shifts.png]]
+* Shifting blowup
+- Pick a k, say 3
+  [[file:bad-shift-tree.png]]
+- Will cause quadratic shifting
+* Shifting blowup
+- Hang k nodes from root
+  [[file:bad-shift-tree-1.png]]
+* Shifting blowup
+- Each of the k nodes is a chain k nodes high
+  file:bad-shift-tree-5.png
+* Shifting blowup
+- Add k nodes in between those nodes
+  [[file:bad-shift-tree-2.png]]
+* Shifting blowup
+- Add 2k + 5 children to leftmost node
+  [[file:bad-shift-tree-3.png]]
+* Shifting blowup
+- Add 2k + 5 nodes to rightmost of leftmost upto k - 1
+  [[file:bad-shift-tree-4.png]]
+* Shifting blowup
+- Again shows k^2 nodes and k^3 runtime
+- Similar procedure as before
+- Omitted for time!
+* Contours
+- Ancestor and leftmost node problem fixed by contours
+- Introduced by Reingold (1981)
+- Maintains the /shape/ of the tree outlines, not left/rightmost nodes
+* Contours
+- Every inner/outer leaf stores a link to left/rightmost child
+- Just re-uses the same space for left/right nodes
+ #+ATTR_LATEX: :width 0.5\linewidth
+ file:contours-1.png
+* Contours
+- Adding new subtree is added, it's inner links are now useless.
+ #+ATTR_LATEX: :width 0.5\linewidth
+ file:contours-2.png
+* Contours
+- Adds a link the rightmost child of the left tree
+- If the right tree were bigger the left outer leaf adds a link
+ #+ATTR_LATEX: :width 0.5\linewidth
+ file:contours-3.png
+* Contours
+- At most 1 link added per subtree combination - linear!
+- To get the leftmost, just follow the left link - linear!
+* Ancestors
+- Finding the common ancestors in linear time
+- The ancestor is the right subtree is just the root
+* Ancestors
+- Each node points to it's parent
+- Also a pointer called /defaultAncestor/
+- If parent isn't the common ancestor, default to /defaultAncestor/
+* Ancestors
+- Leftmost subtree set /defaultAncestor/ to root.
+- Solid arrows are correct links, dashed are expired links
+  #+ATTR_LATEX: :width 0.3\linewidth
+  file:ancestor-1.png
+* Ancestors
+- When right is smaller, right contour is updated
+- No expired links, always point to the correct ancestor
+  #+ATTR_LATEX: :width 0.5\linewidth
+  file:ancestor-2.png
+* Ancestors
+- When right is bigger, /defaultAncestor/ now points to it's root
+- The right shadows everything before it!
+  #+ATTR_LATEX: :width 0.7\linewidth
+  file:ancestor-3.png
+* Shifting (left -> right)
+ - Don't update every intermediate sibling for each conflict!
+ - Records /shift/, and /change/ and aggregate them backwards once last sibling has been reached
+   file:tree-shifts-big-idea.png
+* Shifting (left -> right)
+- Maintain pointer to leftmost sibling.
+- Top number is /shift/, bottom is /change/.
+- No conflicts so far
+
+  #+ATTR_LATEX: :width 0.5\linewidth
+  file:tree-shifts-1.png
+* Shifting (left -> right)
+- Conflict!
+- Shift is 1
+- Change is 1/(number of intermediate subtrees + 1) = 1/3
+- Add -1/3 on conflict node, add +1/3 to leftmost node
+- This is confusing!
+
+  #+ATTR_LATEX: :width 0.5\linewidth
+  file:tree-shifts-2.png
+* Shifting (left -> right)
+- No clashes on the next one.
+
+  #+ATTR_LATEX: :width 0.7\linewidth
+  file:tree-shift-3.png
+* Shifting (left -> right)
+- Conflict !
+- Shift is 1
+- Change is 1/(number of intermediate subtrees + 1) = 1/5
+- Add -1/5 on conflict node, /accumulate/ +1/5 to leftmost node
+- This is still confusing!
+
+  #+ATTR_LATEX: :width 0.7\linewidth
+  file:tree-shift-4.png
+* Shifting (taking stock)
+- /shift/ of 1 from 6th sibling needs to be distributed back by fifths (blue line)
+- /shift/ of 1 from 4th sibling needs to be distributed back by thirds (green line)
+
+#+ATTR_LATEX: :width 0.7\linewidth
+file:tree-shift-taking-stock.png
+* Shifting (right -> left)
+- Top two numbers are the same as before
+- Bottom two are the new /shift/ and propagated /change/.
+- Rightmost node does not move, shift is 0
+file:tree-backpropogate-1.png
+* Shifting (right -> left)
+- Back one node, shift for this node is 1 - 1/5 = 4/5
+- 4/5 propagates back
+file:tree-backpropogate-2.png
+* Shifting (right -> left)
+- Back another node, shift for this node is 4/5 - 1/5 = 3/5
+- We're picking up another shift of 1 & a change of -1/3
+- shift of 1 3/5 & change -1/5 - 1/3 propagates back!
+file:tree-backpropogate-3.png
+* Shifting (right -> left)
+- No conflicts!
+- (1 3/5) + (-1/5 - 1/3) = 2/3 + 2/5!
+- Shift 2/3 + 2/5 and change (-1/5 - 1/3) propagates back!
+file:tree-backpropogate-4.png
+* Shifting (right -> left)
+- No conflicts!
+- (2/3 + 2/5) + (-1/5 - 1/3) = 1/5 + 1/3
+- Shift (1/5 + 1/3), change (-1/5 - 1/3) propagates back!
+file:tree-backpropogate-5.png
+* Shifting (right -> left)
+- No conflicts!
+- The changes accumulated going left -> right was a stopper!
+- (1/5 + 1/3) + (-1/5 - 1/3) = 0!
+file:tree-backpropogate.png
+* Second pass
+- Pre-order, just like Walker
+- We're done!
+
+ file:tree-backpropogate-6.png
+* Resources
+- Bill Mill's page ..
+
+  http://billmill.org/pymag-trees/
+- Reingold's paper ...
+
+  http://reingold.co/tidier-drawings.pdf
+- Walker's paper ...
+
+  http://www.cs.unc.edu/techreports/89-034.pdf
+- Buccheim's paper ...
+
+  https://github.com/tristanpenman/n-puzzle/blob/master/doc/reference/Drawing%20Rooted%20Trees%20in%20Linear%20Time.pdf
